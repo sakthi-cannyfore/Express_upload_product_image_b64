@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input,
+        textarea,
+        button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: black;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Upload Product</h2>
+
+    <form id="productForm" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Product Name" required>
+        <input type="number" name="price" placeholder="Price" required>
+        <input type="text" name="colors" placeholder="Color" required>
+        <input type="text" name="size" placeholder="Size" required>
+        <textarea name="description" placeholder="Description" required></textarea>
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Upload Product</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById("productForm");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/upload-file", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();  
+
+                document.getElementById("result").innerHTML = `
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <img id="previewImage" style="width:200px; margin-top:10px;" />
+                `;
+
+                if (data?.data?.image) {
+                    document.getElementById("previewImage").src =
+                        `data:image/png;base64,${data.data.image}`;
+                }
+
+                alert("Product uploaded successfully!");
+
+            } catch (error) {
+                console.error(error);
+                alert("Failed to upload file");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
